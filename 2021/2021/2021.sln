@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31911.196
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2021", "2021\2021.csproj", "{D5486BA4-41B0-473E-B9EB-BC1B1D50BFC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapaPresentacion", "..\..\..\Grupo05_MantenimientoMatricula (1)\Grupo05_MantenimientoMatricula\ProyectoSistemaCCI  Con Funcionalidad\CapaPresentacion\CapaPresentacion.csproj", "{9CBD2F92-4463-42D0-8BD3-7FEE6061F168}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5486BA4-41B0-473E-B9EB-BC1B1D50BFC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5486BA4-41B0-473E-B9EB-BC1B1D50BFC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5486BA4-41B0-473E-B9EB-BC1B1D50BFC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5486BA4-41B0-473E-B9EB-BC1B1D50BFC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CBD2F92-4463-42D0-8BD3-7FEE6061F168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CBD2F92-4463-42D0-8BD3-7FEE6061F168}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CBD2F92-4463-42D0-8BD3-7FEE6061F168}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CBD2F92-4463-42D0-8BD3-7FEE6061F168}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {545EEEEC-5779-40A7-8577-38D07A150A39}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D5486BA4-41B0-473E-B9EB-BC1B1D50BFC3}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>_2021</RootNamespace>
+    <AssemblyName>2021</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="model\Mantenimiento Matricula\CD_Boleta.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CD_CursoActivo.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CD_Estudiante.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CD_Matricula.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CE_Boleta.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CE_CursoActivo.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CE_Estudiante.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CE_Matricula.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CN_Boleta.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CN_CursoActivo.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CN_Estudiante.cs" />
+    <Compile Include="model\Mantenimiento Matricula\CN_Matricula.cs" />
+    <Compile Include="model\Mantenimiento Cursos\ClaseDatos.cs" />
+    <Compile Include="model\Mantenimiento Cursos\ClaseEntidad.cs" />
+    <Compile Include="model\Mantenimiento Cursos\ClaseNegocio.cs" />
+    <Compile Include="view\In M. Curso\InterfazMantenimientoCurso.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In M. Curso\InterfazMantenimientoCurso.Designer.cs">
+      <DependentUpon>InterfazMantenimientoCurso.cs</DependentUpon>
+    </Compile>
+    <Compile Include="model\Mantenimiento Tipo Matricula\CModulos.cs" />
+    <Compile Include="model\Mantenimiento Tipo Matricula\CDetalles.cs" />
+    <Compile Include="model\Mantenimiento Tipo Matricula\CTipoMatricula.cs" />
+    <Compile Include="model\Mantenimiento Cursos\CCurso.cs" />
+    <Compile Include="view\In. Tipo Matricula\InTipoMatricula.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. Tipo Matricula\InTipoMatricula.Designer.cs">
+      <DependentUpon>InTipoMatricula.cs</DependentUpon>
+    </Compile>
+    <Compile Include="model\Adignacion Carga Academica\CD_CargaAcademica.cs" />
+    <Compile Include="model\Adignacion Carga Academica\CD_CursosActivos.cs" />
+    <Compile Include="model\Adignacion Carga Academica\CD_Docentes.cs" />
+    <Compile Include="model\Adignacion Carga Academica\CN_CargaAcademica.cs" />
+    <Compile Include="model\Adignacion Carga Academica\CN_CursosActivos.cs" />
+    <Compile Include="model\Adignacion Carga Academica\CN_Docentes.cs" />
+    <Compile Include="view\ErrorTxtBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\FormPadre.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\FormPadre.Designer.cs">
+      <DependentUpon>FormPadre.cs</DependentUpon>
+    </Compile>
+    <Compile Include="model\Activacion Curso\Operaciones.cs" />
+    <Compile Include="view\In. ActivacionCurso\Interfaz_Activar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. ActivacionCurso\Interfaz_Activar.Designer.cs">
+      <DependentUpon>Interfaz_Activar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="model\Mantenimiento Docentes\CDocente.cs" />
+    <Compile Include="model\Mantenimiento Docentes\conectar.cs" />
+    <Compile Include="model\conexion.cs" />
+    <Compile Include="model\Mantenimiento Estudiantes\DEstudiante.cs" />
+    <Compile Include="model\Mantenimiento Estudiantes\EEstudiante.cs" />
+    <Compile Include="model\Mantenimiento Estudiantes\NEstudiante.cs" />
+    <Compile Include="view\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="view\In M. Estudiantes\FormMantenimientoEstudiante.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In M. Estudiantes\FormMantenimientoEstudiante.Designer.cs">
+      <DependentUpon>FormMantenimientoEstudiante.cs</DependentUpon>
+    </Compile>
+    <Compile Include="view\In. M. Docente\InDocente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. M. Docente\InDocente.Designer.cs">
+      <DependentUpon>InDocente.cs</DependentUpon>
+    </Compile>
+    <Compile Include="controler\Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="view\In. M. Matricula\VntMatriculaEstudiantes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. M. Matricula\VntMatriculaEstudiantes.Designer.cs">
+      <DependentUpon>VntMatriculaEstudiantes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\VntAsignacionCargaAcademica.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\VntAsignacionCargaAcademica.Designer.cs">
+      <DependentUpon>VntAsignacionCargaAcademica.cs</DependentUpon>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\VntDocentes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\VntDocentes.Designer.cs">
+      <DependentUpon>VntDocentes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\VntHorarioDoecenteCurso.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\VntHorarioDoecenteCurso.Designer.cs">
+      <DependentUpon>VntHorarioDoecenteCurso.cs</DependentUpon>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\VntModificarCargaAcademica.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\In. Carga Academica\VntModificarCargaAcademica.Designer.cs">
+      <DependentUpon>VntModificarCargaAcademica.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="view\In M. Curso\InterfazMantenimientoCurso.resx">
+      <DependentUpon>InterfazMantenimientoCurso.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In. Carga Academica\FormPadre.resx">
+      <DependentUpon>FormPadre.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In M. Estudiantes\FormMantenimientoEstudiante.resx">
+      <DependentUpon>FormMantenimientoEstudiante.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In. M. Docente\InDocente.resx">
+      <DependentUpon>InDocente.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="view\In. ActivacionCurso\Interfaz_Activar.resx">
+      <DependentUpon>Interfaz_Activar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In. Tipo Matricula\InTipoMatricula.resx">
+      <DependentUpon>InTipoMatricula.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In. M. Matricula\VntMatriculaEstudiantes.resx">
+      <DependentUpon>VntMatriculaEstudiantes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In. Carga Academica\VntAsignacionCargaAcademica.resx">
+      <DependentUpon>VntAsignacionCargaAcademica.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In. Carga Academica\VntDocentes.resx">
+      <DependentUpon>VntDocentes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In. Carga Academica\VntHorarioDoecenteCurso.resx">
+      <DependentUpon>VntHorarioDoecenteCurso.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="view\In. Carga Academica\VntModificarCargaAcademica.resx">
+      <DependentUpon>VntModificarCargaAcademica.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
