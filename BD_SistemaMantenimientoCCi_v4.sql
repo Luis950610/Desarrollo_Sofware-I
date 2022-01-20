@@ -27,6 +27,7 @@
 	EXEC  sp_addtype  TCodCursoActivo, 'varchar(5)','NOT NULL' -- Grupo 05
 	EXEC  sp_addtype  TCodBoleta, 'varchar(12)','NOT NULL'		-- Grupo 05
 	EXEC  sp_addtype  TCodMatricula, 'varchar(8)','NOT NULL'	-- Grupo 05
+	EXEC  sp_addtype  TNroBoleta, 'varchar(12)','NOT NULL'		-- MATRICULAS DAI
 
 	/*========================== TABLA ESTUDIANTE - GRUPO 01 ==========================*/
 	CREATE TABLE TEstudiante
@@ -91,7 +92,6 @@
 		-- Definicion de claves
 		PRIMARY KEY(Cod_DetallePago)
 	)
-	
 	GO
 
 	/*========================== TABLA PAGO  - GRUPO 04 ==========================*/
@@ -171,6 +171,18 @@
 		Mes VARCHAR(15) not null,
 		CodCursoActivo TCodCursoActivo not null,
 		CodBoleta   TCodBoleta not null,
+		TipoMatricula VARCHAR(5) not null, --- ATRIBUTO NUEVO
+		--notas correspondientes a la matricula
+		nota1 float,
+		nota2 float,
+		nota3 float,
+		nota4 float,
+		nota5 float,
+		nota6 float,
+		nota7 float,
+		nota8 float,
+		nota9 float,
+		nota10 float,
 		-- Definicion de claves
 		PRIMARY KEY (CodMatricula),
 		FOREIGN KEY (CodBoleta) REFERENCES TBoleta(Codigo_Boleta),
@@ -330,7 +342,10 @@
 		@Nombre VARCHAR(50)
 	AS
 		SELECT * FROM TCurso
-		WHERE Nombre_Curso like @Nombre+'%'
+		WHERE (Codigo_Curso like @Nombre+'%')
+		or (Nombre_Curso like @Nombre+'%')
+		or (Temas like @Nombre+'%')
+		or (Tipo_Curso like @Nombre+'%')
 	GO
 
 	/* ---------------- Procedimiento para Mantenimiento Curso --------------- */ --REVISION
@@ -339,7 +354,7 @@
 		@Nombre VARCHAR(50),
 		@Tipo VARCHAR(5),
 		@Temas VARCHAR(50),
-		@Estado VARCHAR(11),
+		@Estado VARCHAR(11), -- OBVIAR? CONSULTAR
 		@HorasxSemana int,
 		@accion VARCHAR(50) OUTPUT
 	AS
@@ -351,7 +366,7 @@
 		SET @CodigoMax=isnull(@CodigoMax,'IF000')
 		SET @CodigoNuevo='IF'+RIGHT(RIGHT(@CodigoMax,3)+11001,3)
 		BEGIN TRANSACTION
-			INSERT INTO TCurso(Codigo_Curso,Nombre_Curso,Tipo_Curso,Temas,HorasxSemana)
+			INSERT INTO TCurso(Codigo_Curso,Nombre_Curso,Tipo_Curso,Temas,Estado,HorasxSemana)
 			VALUES(@CodigoNuevo,@Nombre,@Tipo,@Temas,@Estado,@HorasxSemana)
 		COMMIT TRANSACTION
 		SET @accion='Se genero el codigo: '+@CodigoNuevo
@@ -407,25 +422,25 @@
 
 
 	/* ================== PROCEDIMIENTOS ALMACENADOS PARA EL MODULO MANTENIMEINTO DOCENTE - GRUPO 03 ================== */
+	/* ---------------- Función para Generar Codigo Docentes --------------- */
+	CREATE FUNCTION GenerarCodDocente()
+	RETURNS VARCHAR(6)
+	AS
+	BEGIN
+			-- Declarar variables para generar codigo
+			DECLARE @Codigo VARCHAR(6), @CodMax1 VARCHAR(6)
+			SET @CodMax1 = (SELECT MAX(Codigo_Docente) FROM TDocentes)
+			SET @CodMax1 = ISNULL(@CodMax1,'D00000')
+			SET @Codigo = 'D'+RIGHT(RIGHT(@CodMax1,4)+10001,4)
+			RETURN @Codigo
+	END;
+	GO
+	
 	/* ---------------- Procedimiento para Listar Docentes --------------- */
 	Create procedure ListarDocentes
 	AS
-	--empesar una transaccion
-	BEGIN TRY
-		BEGIN TRAN
 		-- Mostrar Datos
-		select *
-			from TDocentes
-			order by Codigo_Docente ASC;
-		-- Aceptar una transaccion | validar una transaccion
-		COMMIT
-	END TRY
-
-	BEGIN CATCH
-		--- Cancelar una trans accion
-		ROLLBACK
-			PRINT ERROR_MESSAGE()
-	END CATCH -- deteccion de errores
+		select * from TDocentes order by Codigo_Docente ASC;
 	GO
 
 	/* ---------------- Procedimiento para Insertar Docentes --------------- */
@@ -486,31 +501,14 @@
 	CREATE PROCEDURE EliminarDocente
 		@Codigo varchar(10)
 	AS
-		BEGIN TRY
-			BEGIN TRAN
 				delete from TDocentes where Codigo_Docente like @Codigo +'%'
-			COMMIT
-		END TRY
-		BEGIN CATCH
-			ROLLBACK
-			PRINT ERROR_MESSAGE()
-		END CATCH
 	GO
 
 	/* ---------------- Procedimiento para Buscar Docentes por Codigo --------------- */
 	CREATE PROCEDURE BuscarDocente @Codigo varchar(10)
 	AS
-	BEGIN TRY
-		BEGIN TRAN
 		select * from TDocentes
 		where Codigo_Docente like @Codigo + '%'
-	COMMIT
-	END TRY
-
-	BEGIN CATCH
-		ROLLBACK
-		PRINT ERROR_MESSAGE()
-	END CATCH
 	GO
 
 
@@ -546,7 +544,8 @@
 	GO
 
 	/* ---------------- Procedimiento para Listar alumnos de un determinado curso por Codigo --------------- */
-	create procedure pListaAlumnos @Cod_Curso varchar(4)
+	create procedure pListaAlumnos 
+	@Cod_Curso varchar(4)
 	as
 	begin
 		select P.Codigo_Curso, A.Codigo_Estudiante, A.Apellido_Paterno, A.Apellido_Materno, A.Nombres, A.DNI, A.Email
@@ -600,36 +599,18 @@
 	create proc SP_Buscar_EstudianteMatriculado
 	@Codigo varchar(50)
 	AS
-	BEGIN TRY
-		begin tran
 		select*
 		from TEstudiante
 		where Codigo_Estudiante like @Codigo+'%'
-		commit tran
-	END TRY
-	BEGIN CATCH
-		SELECT ERROR_MESSAGE()
-		ROLLBACK TRAN
-	END CATCH
 	GO
 
 	/* ---------------- Procedimiento para Detalle de Matricula Estudiante --------------- */
 	CREATE PROCEDURE SP_DetalleMatriculaEstudiante
 	AS
-	BEGIN
-		BEGIN TRY
-			begin tran
 			SELECT E.Codigo_Estudiante,E.Nombres,E.Apellido_Paterno,E.Apellido_Materno,E.DNI,E.Email,
 				B.NroSerie, B.Codigo_Boleta,B.Pago,B.TipoDsto,B.Costo,B.Observacion
 				FROM TEstudiante E inner join TBoleta B
 				ON  (E.Codigo_Estudiante = B.Codigo_Estudiante)
-		   commit tran
-		END TRY
-		BEGIN CATCH
-			SELECT ERROR_MESSAGE()
-			ROLLBACK TRAN
-		END CATCH
-	END;
 	GO
 
 	/* ---------------- Procedimiento para Mantenimiento de Estudiante Matriculado --------------- */
@@ -689,19 +670,10 @@
 	/* ---------------- Procedimiento para Listar Estudiante Matriculado --------------- */
 	CREATE PROCEDURE SP_Listar_EstudianteMatriculado
 	AS
-	BEGIN 
-		BEGIN TRY
 			begin tran
 			select*
 			from TEstudiante 
 			order by Codigo_Estudiante
-			commit tran
-		END TRY
-		BEGIN CATCH
-			SELECT ERROR_MESSAGE()
-			ROLLBACK TRAN
-		END CATCH
-	END;
 	GO
 
 	/* ---------------- Procedimiento para Agregar Boleta Estudiante --------------- */
@@ -748,7 +720,7 @@
 		IF(@accion='1')
 			BEGIN TRY
 				begin tran
-				insert into TBoleta(Codigo_Boleta,NroSerie,FechaEmision,Costo,TipoDsto,Pago,CodCursoActivo,Codigo_Estudiante,Observacion)
+				insert into TBoleta(Codigo_Boleta,NroSerie,FechaEmision,Costo,TipoDsto,Pago,Codigo_CursoActivo,Codigo_Estudiante,Observacion)
 				values(@CodBoleta,@NroSerie,@FechaEmision,@Costo,@TipoDsto,@Pago,@CodCursoActivo,@CodEstudiante,@Observacion)
 				set @accion='Se genero el codigo: '+ @CodBoleta
 				commit tran
@@ -788,33 +760,13 @@
 	/* ---------------- Procedimiento para Descuento Matricula Estudiante --------------- */
 	CREATE PROCEDURE SP_Mostrar_TipoDescuento
 	AS
-	BEGIN 
-	BEGIN TRY 
-		begin tran
-		SELECT DISTINCT TipoDsto FROM tBoleta
-		commit tran
-	END TRY
-	BEGIN CATCH
-		SELECT ERROR_MESSAGE()
-		ROLLBACK TRAN
-	END CATCH
-	END;
+		SELECT DISTINCT TipoDsto FROM TBoleta
 	GO
 
 	/* ---------------- Procedimiento para Curso Activo --------------- */
 	CREATE PROCEDURE SP_Mostrar_CursoActivo
 	AS
-	BEGIN 
-	BEGIN TRY 
-		begin tran
 		SELECT Codigo_CursoActivo,Nombre,CONCAT(Codigo_CursoActivo,' - ',Nombre) as Codigo FROM TCursoActivo
-		commit tran
-	END TRY
-	BEGIN CATCH
-		SELECT ERROR_MESSAGE()
-		ROLLBACK TRAN
-	END CATCH
-	END;
 	GO
 
 	/* ================== PROCEDIMIENTOS ALMACENADOS PARA EL MODULO ASIGNACIÓN-CARGA-DOCENTE - GRUPO 06 ================== */
@@ -995,7 +947,6 @@
 		@Año varchar(4)
 	as
 		insert into TCargaAcademica values (@CodCurso,@Grupo,@CodDocente,@Periodo,@Año)
-
 	go
 
 	/*---------------- Procedimiento para Eliminar una carga academica ---------------- */
@@ -1017,13 +968,12 @@
 		update TCargaAcademica 
 			set CodDocente=@CodDocente
 			where CodCargAcademica=@CodCargaAcademica;
-
 	go
 
 	/*	***************************************************************************************** 
 		|						TRIGGERS (DISPARADORES) DE LA BASE DE DATOS						|
 		*****************************************************************************************  */
-	/* ================== TRIGGERS PARA LA TABLA CURSO ================== */
+	/* ================== TRIGGERS PARA LA TABLA CURSO - GRUPO 02 ================== */
 	/* Triggers para Actualizar Estado*/
 	create trigger TActualizar
 	on TCurso
@@ -1043,7 +993,7 @@
 	/*	***************************************************************************************** 
 		|								VISTAS DE LA BASE DE DATOS								|
 		*****************************************************************************************  */
-	/* ================== VISTAS PARA LA TABLA CARGA ACADEMICA ================== */
+	/* ================== VISTAS PARA LA TABLA CARGA ACADEMICA  - GRUPO 06 ================== */
 	-- Modulos devuelven tablas 
 	/* ---------------- Vistas para curso con Carga --------------- */
 	CREATE VIEW viCursosConCargaAcademica
@@ -1062,4 +1012,544 @@
 		except 
 		select T.Codigo_CursoActivo, T.Grupo, T.Periodo, T.Año
 			from viCursosConCargaAcademica T 
+	go
+
+
+	/*========================================================================================================*/
+	/*= = = = = = = = = = = = = = = = = = = = = = SEGUNDO SPRINT = = = = = = = = = = = = = = = = = = = = = = =*/
+	/*========================================================================================================*/
+	USE db_BDSistemaMantenimientosCCI
+	GO
+
+	/*  ***************************************************************************************** 
+		|						CREACION DE LAS TABLAS DEL SISTEMA (2DO SPRINT)					|
+		*****************************************************************************************  */
+
+	/* ****************** REALIZADO POR: NINA CARLOS ****************** */
+	/*========================== TABLA PAQUETE ==========================*/
+	CREATE TABLE TPaquete
+	(
+		Codigo_Paquete INT IDENTITY(1,1),
+		--Codigo_curso varchar(5) not null,
+		Denominacion VARCHAR(50) not null,
+		Nro_Requisitos INT, -- NroRequisitos
+		PRIMARY KEY (Codigo_paquete)
+	)
+	GO
+
+	/*========================== TABLA DETALLE - PAQUETE ==========================*/
+	CREATE TABLE TDetalle_Paquete
+	(
+		Codigo_Paquete int not null,
+		Codigo_Curso varchar(5) not null,
+		foreign key (Codigo_Paquete) references TPaquete(Codigo_Paquete),
+		foreign key (Codigo_Curso) references TCurso(Codigo_Curso)
+	)
+	GO
+
+
+	/* ****************** REALIZADO POR: HUAMAN PAOLA & ORTEGA ACCENT. ****************** */
+	/*========================== TABLA GESTION BOLETAS ==========================*/
+	create table TGestionBoletas
+	(
+		IDComprobante  TCodBoleta NOT NULL,
+		Fecha DATETIME NOT NULL, -- Tabla Boleta
+		Estado VARCHAR(50) NOT NULL, -- Tabla Boleta
+		Serie VARCHAR(10) NOT NULL,  -- Tabla Boleta
+		Comprobante VARCHAR(10) NOT NULL,  
+		Descripcion VARCHAR(50) NOT NULL,
+		Doc VARCHAR(10) NOT NULL,
+		CodAlumno TCod_Estudiante NOT NULL, -- Tabla Estudiante
+		ApellidosNombres VARCHAR(50) NOT NULL, -- Table estudiante
+		Monto FLOAT NOT NULL, -- Tabla Boleta
+		FOREIGN KEY(IDComprobante) REFERENCES TBoleta(Codigo_Boleta),
+		FOREIGN KEY(CodAlumno) REFERENCES TEstudiante(Codigo_Estudiante)
+	);
+	GO --REVISION
+
+
+	/* ****************** REALIZADO POR: HUALVERDE BENJAMIN ****************** */
+	/*========================= Tabla de Alumnos con matriculas Postergadas =====================*/
+	create table TMatriculaPostergada
+	(
+		CodMatriculaPostergada INT IDENTITY(1,1) not null, 
+		CodMatricula  TCodMatricula,
+		--Talvez ya no seria necesario agregar CodEstudiante, pero si seria bueno poner esto, para facilitar a un grupo encargado
+		--De cambio de grupo
+		CodEstudiante TCod_Estudiante
+		primary key(CodMatriculaPostergada),
+		foreign key(CodMatricula)references TMatricula
+	)
+	GO
+
+
+	/* ****************** REALIZADO POR: SANCA JERY****************** */
+	/*========================= Tabla ESTUDIANTE DAI =====================*/
+	create table TEstudianteDAI
+	( -- lista de atributos
+	  CodEstudiante   TCod_Estudiante NOT NULL,
+	  Nombre          varchar(40) NOT NULL,
+	  ApPaterno       varchar(40) NOT NULL,
+	  ApMaterno       varchar(40) NOT NULL,
+	  TipoDocumento   varchar(8) NULL,
+	  Email           varchar(50) NULL,
+	  Sexo            varchar(2) NOT NULL,
+	  -- definición de claves
+	  PRIMARY KEY (CodEstudiante)
+	)
+	go
+
+	/*========================= Tabla BOLETA DAI =====================*/
+	create table TBoletaDAI
+	( -- lista de atributos
+	  NroBoleta          TNroBoleta NOT NULL,
+	  NroSerie			varchar(10) not null,
+	  Costo          varchar(4) ,
+	  Pago          varchar(4) ,
+	  CodCurso TCod_Curso Not NULL,
+	  CodEstudiante       TCod_Estudiante,
+	  Observacion   varchar(50) not null
+	  -- definicion de claves
+	  PRIMARY KEY (NroBoleta),
+	  FOREIGN KEY (CodEstudiante) REFERENCES TEstudianteDAI(CodEstudiante)
+	)
+	go
+
+	/*========================= Tabla CURSO DAI =====================*/
+	create table TCursoDAI
+	(
+		CodCurso TCod_Curso not null,
+		Grupo varchar(1),
+		Nombre varchar(50),
+		Vacantes int,
+		primary key(CodCurso)
+	)
+	go
+
+	/*========================= Tabla MATRICULA DAI =====================*/
+	create table TMatriculaDAI
+	( -- lista de atributos
+	  CodMatricula      TCodMatricula NOT NULL,
+	  Periodo			varchar(10) not null,
+	  Año				int not null,
+	  CodCurso			TCod_Curso not null,
+	  NroBoleta         TCodBoleta NOT NULL,
+	  PRIMARY KEY (CodMatricula),
+	  FOREIGN KEY (NroBoleta) REFERENCES TBoletaDAI(NroBoleta),
+	  FOREIGN KEY (CodCurso) REFERENCES TCursoDAI(CodCurso),
+	 )
+	 GO
+	 --Drop table TMatriculaDAI
+	/*========================= Tabla ASIGNACIÓN CURSO =====================*/
+	create table TAsignacionCurso
+	(
+	  Horario varchar(15) not null,
+	  Aula varchar(10) not null,
+	  CodCurso TCod_Curso not null,
+	  Docente varchar(50)not null,
+	  foreign key (CodCurso) references TCursoDAI(CodCurso)
+	)
+	GO
+
+
+	/*  ***************************************************************************************** 
+		|		FUNCIONES Y PROCEDIMIENTOS ALMACENADOS DE LA BASE DE DATOS (2DO SPRINT)			|
+		*****************************************************************************************  */
+
+	/* ****************** REALIZADO POR: NINA H. CARLOS A. ****************** */
+	/* ================== PROCEDIMIENTOS ALMACENADOS PARA EL MODULO PAQUETE ================== */
+	/*--------------- Procedimiento para insertar un nuevo paquete ---------------*/
+	CREATE PROCEDURE spInsertar_Paquete	
+		@Denominacion varchar(50),
+		@Nro_Requisitos int
+	AS
+	BEGIN
+		begin try
+			begin tran
+				-- Insertar paquete en la tabla 
+				INSERT INTO TPaquete output inserted.Codigo_Paquete
+					VALUES (@Denominacion,@Nro_Requisitos)
+				commit tran
+		end try
+		begin catch
+				select ERROR_MESSAGE()
+				rollback tran
+		end catch
+
+	END;
+	GO
+
+	/* ---------------- Procedimiento para Editar un Paquete --------------- */
+	CREATE PROCEDURE spEditar_Paquete
+	@Codigo_Paquete VARCHAR(6),
+	@Denominacion varchar(50),
+	@Nro_Requisitos int
+	AS
+	BEGIN
+		begin try
+			begin tran
+				-- Editar Paquete en la tabla de TPaquete
+				UPDATE TPaquete SET	Denominacion=@Denominacion,
+									Nro_Requisitos=@Nro_Requisitos								
+									-- Parametro de comparación
+				WHERE Codigo_Paquete=@Codigo_Paquete
+				commit tran
+		end try
+		begin catch
+				select ERROR_MESSAGE()
+				rollback tran
+		end catch
+	END;
+	GO
+
+	/* ---------------- Procedimiento para Eliminar un Paquete --------------- */
+	CREATE PROCEDURE spEliminar_Paquete
+		@Codigo_Paquete VARCHAR(6)
+	AS
+		-- Eliminar Paquete de la tabla
+		DELETE FROM TPaquete
+		-- Parametro de comparacion
+		WHERE Codigo_Paquete=@Codigo_Paquete
+	GO
+
+	/* ---------------- Procedimiento para buscar un Paquete --------------- */	
+	CREATE PROCEDURE spBuscar_Paquete
+		@Denominacion VARCHAR(50)
+	AS
+		SELECT * FROM TPaquete
+		WHERE Denominacion like @Denominacion+'%'
+	GO
+
+	/* ---------------- Procedimiento para listar Paquetes --------------- */
+	CREATE PROCEDURE spListar_Paquetes
+	AS
+		SELECT * FROM TPaquete
+		ORDER BY Denominacion ASC
+	GO
+
+	/* ================== PROCEDIMIENTOS ALMACENADOS PARA EL MODULO DETALLE_PAQUETE ================== */
+	/* ---------------- Procedimiento para insertar un Detalle_Paquete --------------- */
+	CREATE PROCEDURE spInsertar_Detalle_Paquete	
+	@Codigo_Paquete int,
+	@Codigo_Curso varchar(5)
+	AS
+	BEGIN
+		begin try
+			begin tran
+				-- Insertar codigo paquete y curso en la tabla 
+				INSERT INTO TDetalle_Paquete
+					VALUES (@Codigo_Paquete,@Codigo_Curso)
+				commit tran
+		end try
+		begin catch
+				select ERROR_MESSAGE()
+				rollback tran
+		end catch
+
+	END;
+	GO
+
+	/* ---------------- Procedimiento para Eliminar un Detalle_Paquete --------------- */
+	CREATE PROCEDURE spEliminar_Detalle_Paquete
+	@Codigo_Paquete VARCHAR(6)
+	AS
+		-- Eliminar detalle paquete de la tabla
+		DELETE FROM TDetalle_Paquete
+		-- Parametro de comparacion
+		WHERE Codigo_Paquete=@Codigo_Paquete
+	GO
+
+	/*---------------- Procedimiento Listar el contenido de cada paquete ----------------*/
+	CREATE PROCEDURE spListar_Detalle_Paquete_especifico
+	@Codigo_Paquete varchar(6)
+	AS
+	begin
+		SELECT TC.Codigo_Curso,TC.Nombre_Curso,TC.Tipo_Curso,TC.Temas,TC.HorasxSemana	
+			FROM TDetalle_Paquete P inner join TCurso TC 
+				on P.Codigo_Curso = TC.Codigo_Curso
+			where P.Codigo_Paquete = @Codigo_Paquete
+		ORDER BY TC.Nombre_Curso ASC
+	end
+	GO
+
+
+	/*-------------------- REALIZADO POR: HUAMAN PAOLA Y ORTEGA ACCENT. --------------------*/
+	/* ================== PROCEDIMIENTOS ALMACENADOS PARA EL MODULO GESTION BOLETAS ================== */
+	/*---------------- Procedimiento Listar Gestion Boletas ----------------*/
+	Create procedure ListarGestionBoletas
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+	GO
+
+	/*---------------- Procedimiento Editar Gestion Boletas ----------------*/
+	CREATE PROCEDURE EditarGestionBoletas
+		@Estado varchar(50), 
+		@Serie varchar(10), 
+		@Comprobante varchar(10), 
+		@IDComprobante varchar(10), 
+		@Descripcion varchar(50), 
+		@Doc varchar(10), 
+		@CodAlumno varchar(10), 
+		@ApellidosNombres varchar(50), 
+		@Monto float
+	AS
+	BEGIN TRY
+		BEGIN TRAN
+			update TGestionBoletas 
+			set  Estado =@Estado, Serie = @Serie, Comprobante = @Comprobante, Descripcion = @Descripcion, Doc = @Doc, CodAlumno = @CodAlumno, ApellidosNombres = @ApellidosNombres, Monto = @Monto
+			where IDComprobante like @IDComprobante +'%'
+		COMMIT
+	END TRY
+
+	BEGIN CATCH
+		ROLLBACK
+		PRINT ERROR_MESSAGE()
+	END CATCH
+	GO
+
+	/*---------------- Procedimiento Buscar IDComprobante ----------------*/
+	CREATE PROCEDURE BuscarIDComprobante @IDComprobante varchar(10)
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+			from TGestionBoletas
+			where IDComprobante like @IDComprobante +'%'
+	GO
+
+	/*---------------- Procedimiento Buscar Descripcion ----------------*/
+	CREATE PROCEDURE BuscarDescripcion12 @Descripcion varchar(50)
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+		where Descripcion like @Descripcion +'%'
+	GO
+
+	/*---------------- Procedimiento Buscar Estado ----------------*/
+	CREATE PROCEDURE BuscarEstado @Estado varchar(50)
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+		where Estado like @Estado +'%'
+	GO
+
+	/*---------------- Procedimiento Buscar Serie ----------------*/
+	CREATE PROCEDURE BuscarSerie @Serie varchar(10)
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+		where Serie like @Serie +'%'
+	GO
+
+	/*---------------- Procedimiento Buscar Comprobante ----------------*/
+	CREATE PROCEDURE BuscarComprobante @Comprobante varchar(10)
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+		where Comprobante like @Comprobante +'%'
+	GO
+
+	/*---------------- Procedimiento Buscar Doc ----------------*/
+	CREATE PROCEDURE BuscarDoc @Doc varchar(10)
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+		where Doc like @Doc +'%'
+	GO
+
+	/*---------------- Procedimiento Buscar Alumno ----------------*/
+	CREATE PROCEDURE BuscarCodAlumno @CodAlumno varchar(10)
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas where CodAlumno like @CodAlumno +'%'
+	GO
+
+	/*---------------- Procedimiento Buscar Apellido ----------------*/
+	CREATE PROCEDURE BuscarApellidosNombres @ApellidosNombres varchar(50)
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+		where ApellidosNombres like @ApellidosNombres +'%'
+	GO
+
+	/*---------------- Procedimiento Buscar Fecha/Año ----------------*/
+	CREATE PROCEDURE BuscarFechaAño @Año int
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+		where YEAR(Fecha) = @Año
+	GO
+
+	/*---------------- Procedimiento Buscar Periodo ----------------*/
+	CREATE PROCEDURE BuscarPeriodo @Periodo int
+	AS
+		select IDComprobante as Id, Fecha, Estado, Serie, Comprobante, Descripcion, Doc, CodAlumno, ApellidosNombres, Monto
+		from TGestionBoletas
+		where Month(Fecha) = @Periodo
+	GO
+
+	/*---------------- Procedimiento Transferir ----------------*/
+	CREATE PROCEDURE Transferir 
+		@Id INT, 
+		@CodAlumno VARCHAR(10), 
+		@ApellidosNombres VARCHAR(50)
+	AS
+	BEGIN TRY
+	BEGIN TRAN
+		update TGestionBoletas
+	set CodAlumno = @CodAlumno, ApellidosNombres = @ApellidosNombres
+	where Id = @Id
+
+	COMMIT
+	END TRY
+
+	BEGIN CATCH
+		ROLLBACK
+		PRINT ERROR_MESSAGE()
+	END CATCH
+	GO
+
+	/* ****************** REALIZADO POR: SANCCA JERY ****************** */
+	/*---------------- Procedimiento para BUSCAR CURSOS DAI ----------------*/
+	create proc sp_Buscar_mCursoDAI
+	@Nombre varchar(50)
+	as
+		select*from TCursoDAI
+		where (CodCurso like @Nombre+'%')or (Nombre like @Nombre+'%')
+	go
+
+	/*---------------- Procedimiento para LISTAR CURSOS DAI ----------------*/
+	create proc sp_listar_mCursoDAI
+	as
+	select*
+		from TCursoDAI
+		order by CodCurso
+	go
+
+	/*---------------- Procedimiento para LISTAR ESTUDIANTES DAI ----------------*/
+	create proc sp_listar_Estudiante
+	as
+		select*
+		from TEstudianteDAI
+		order by CodEstudiante
+	go
+
+	/*---------------- Procedimiento para BUSCAR ESTUDIANTES DAI ----------------*/
+	create proc sp_Buscar_Alumno
+	@Nombre varchar(50)
+	as
+	select*from TEstudianteDAI
+	where (CodEstudiante like @Nombre+'%')
+			or (Nombre like @Nombre+'%')
+			or (ApMaterno like @Nombre+'%')
+			or (ApPaterno like @Nombre+'%')
+	go
+
+	/*---------------- Procedimiento para INSERTAR ESTUDIANTES DAI ----------------*/
+	create proc sp_insertar_Alumno
+	@CodEstudiante   TCod_Estudiante,
+	@Nombre          varchar(40) , 
+	@ApPaterno       varchar(40)  ,
+	@ApMaterno       varchar(40),
+	@TipoDocumento   varchar(8),
+	@Email           varchar(50), 
+	@Sexo            varchar(2),
+	@accion varchar(50) output
+	as
+	if(@accion='1')
+	begin try
+	--para probar
+		declare @CodigoNuevo varchar(12),@CodigoMax varchar(12)
+		set @CodigoMax=(select max(CodEstudiante)from TEstudianteDAI)
+		set @CodigoMax=isnull(@CodigoMax,'18000')
+		set @CodigoNuevo='18'+RIGHT(RIGHT(@CodigoMax,3)+11001,3)
+		begin transaction
+		insert into TEstudianteDAI(CodEstudiante,Nombre,ApPaterno,ApMaterno,TipoDocumento,Email,Sexo)
+		values(@CodigoNuevo,@Nombre,@ApPaterno,@ApMaterno,@TipoDocumento, @Email ,@Sexo )
+		commit transaction
+		set @accion='Se Inserto el codigo: '+@CodigoNuevo
+	end try
+
+	begin catch
+	--ejecutar si ocurre un error
+	PRINT'Error Number : '+CAST(ERROR_NUMBER()AS varchar(10));
+	PRINT'Error Message : '+ERROR_MESSAGE();
+	PRINT'Error Severity : '+CAST(ERROR_SEVERITY()AS varchar(10));
+	PRINT'Error State : '+CAST(ERROR_STATE()AS varchar(10));
+	PRINT'Error Line : '+CAST(ERROR_LINE()AS varchar(10));
+	PRINT'Error Proc: '+COALESCE(ERROR_PROCEDURE(),'Not within procedure')
+	ROLLBACK TRANSACTION;
+
+	end catch
+	go
+
+	/*---------------- Procedimiento para LISTAR CURSOS DAI ----------------*/
+	create proc sp_listar_DAI
+	as
+		select C.CodCurso,C.Grupo,A.Horario,A.Aula,C.Nombre,B.Costo,A.Docente,C.Vacantes,Count(B.CodEstudiante)as Inscritos
+		from TBoletaDAI B,TCursoDAI C,TAsignacionCurso A
+		WHERE (C.CodCurso=B.CodCurso AND A.CodCurso=C.CodCurso )
+		GROUP BY  C.CodCurso,C.Grupo,A.Horario,A.Aula,C.Nombre,B.Costo,A.Docente,C.Vacantes
+		order by  C.CodCurso
+	go
+
+	/*---------------- Procedimiento para LISTAR ALUMNO ----------------*/
+	create proc sp_listar_Alumnos
+	@CodigoCurso varchar(50)
+	as
+		select E.CodEstudiante,CONCAT_WS(' ',E.Nombre,E.ApPaterno,E.ApMaterno) AS Nombre,B.Pago,B.Observacion,b.NroBoleta
+		from TEstudianteDAI E,TBoletaDAI B
+		where (E.CodEstudiante=B.CodEstudiante)AND(B.CodCurso like @CodigoCurso+'%')
+	go
+
+	/*---------------- Procedimiento para INSERTAR BOLETA ----------------*/
+	create proc sp_insertar_Boleta
+	@NroBoleta   TNroBoleta,
+	@NroSerie         varchar(10) , 
+	@Costo      varchar(4),
+	@Pago           varchar(4),
+	@CodCurso TCod_Curso,
+	@CodEstudiante Tcod_Estudiante,
+	@Observacion varchar(50),
+	@accion varchar(50) output
+	as
+	if(@accion='1')
+	begin try
+	--para probar
+		declare @NroSerieNuevo varchar(12),@NroSerieMax varchar(12)
+		declare @NroBoletaNuevo TNroBoleta,@NroBoletaMax TNroBoleta
+		declare @CostoNuevo varchar(4)
+		set @CostoNuevo='10'
+		set @NroSerieMax=(select max(NroSerie)from TBoletaDAI)
+		set @NroSerieMax=isnull(@NroSerieMax,'100')
+		set @NroSerieNuevo='1'+RIGHT(RIGHT(@NroSerieMax,2)+101,2)
+
+		set @NroBoletaMax=(select max(NroBoleta)from TBoletaDAI)
+		set @NroBoletaMax=isnull(@NroBoletaMax,'100000')
+		set @NroBoletaNuevo='1'+RIGHT(RIGHT(@NroBoletaMax,5)+100001,5)
+
+		begin transaction
+		insert into TBoletaDAI(NroBoleta,NroSerie,Costo,Pago,CodCurso,CodEstudiante,Observacion)
+		values(@NroBoletaNuevo,@NroSerieNuevo,@CostoNuevo,@Pago,@CodCurso,@CodEstudiante,@Observacion)
+		commit transaction
+		set @accion='Se Inserto la Boleta : '+@NroBoletaNuevo
+	end try
+
+	begin catch
+	--ejecutar si ocurre un error
+	PRINT'Error Number : '+CAST(ERROR_NUMBER()AS varchar(10));
+	PRINT'Error Message : '+ERROR_MESSAGE();
+	PRINT'Error Severity : '+CAST(ERROR_SEVERITY()AS varchar(10));
+	PRINT'Error State : '+CAST(ERROR_STATE()AS varchar(10));
+	PRINT'Error Line : '+CAST(ERROR_LINE()AS varchar(10));
+	PRINT'Error Proc: '+COALESCE(ERROR_PROCEDURE(),'Not within procedure')
+	ROLLBACK TRANSACTION;
+	end catch
+	GO
+
+	/*---------------- Procedimiento para LISTAR BOLETA ----------------*/
+	create proc sp_listar_Boleta
+	as
+	select*
+	from TBoletaDAI
+	order by NroBoleta
 	go
