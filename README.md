@@ -1,5 +1,5 @@
-# Proyecto de fin de semestre para el curso de "Desarrollo de software I"---UNSAAC-2021-I
-# Proyecto_2021  
+# Proyecto "Desarrollo de software I"---UNSAAC-2021-I
+# # Grupo Desarrolladores 
 ## Asignatura : Desarrollo de Sofware I
 ## Docente : Maria del Pilar Venegas Vergara
 ### Nombre del Proyecto : BD_Sistema de Mantenimiento CCI  
