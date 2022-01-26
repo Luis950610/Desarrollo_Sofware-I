@@ -6,13 +6,21 @@
 - Facultad: Facultad de Ingeniería Eléctrica, Electrónica, Informática y Mecánica
 - Escuela Prof: Ingenieria Informatica y de Sistemas.
 #### Docente:
-Maria del Pilar Venegas Vergara
-### Nombre del Proyecto : BD_Sistema de Mantenimiento CCI  
-### Centro de Estudios : Universidad Nacional San Antonio Abad del Cusco 
-####  Integrantes de grupo: ✒️
-- ** Amilcar Ayquipa Gomez  **
+Ing. Mgtr.Maria del Pilar Venegas Vergara
+### Nombre del Proyecto : BD_Sistema de Mantenimiento CCI 
+#### Trabajo:
+- Repositorio de Git Hub
+- Base de Datos 
+- Control de Versiones
+#### Autores:✒️
+ - ** Amilcar Ayquipa Gomez  **
 - ** Nelson Bertol Castro  **
 - ** Abrahan Elias Champi Champi **
 - ** Jhon Waldir Guerra Bellido **
 - ** Benjamin Alexander Hualverde Quispe**
 - ** Jery Sanca Zevallos **
+## Empezamos... 🚀
+
+### Construido con... 🛠️
+C# y SQL
+
